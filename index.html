@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vandal Shop</title>
+    <!-- css -->
+    <link rel="stylesheet" href="./src/index.css" />
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+</head>
+
+<body>
+    <h1 class="top">Vandal Shop</h1>
+    <div class="container">
+        <div class="card">
+            <h3 class="font_size">Forsaken Vandal</h3>
+            <img src="./src/img/forsaken.png" class="mask" />
+            <div class="box-price">
+                <label class="font">0.000040 ETH</label>
+                <button id="btn_buy" class="button" onclick="btnBuy('Forsaken', 40000000000000)">
+                    Buy
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="font_size">Glitchpop Vandal</h3>
+            <img src="./src/img/glitchpop.png" class="mask" />
+            <div class="box-price">
+                <label class="font">0.000030 ETH</label>
+                <button id="btn_buy" class="button" onclick="btnBuy('Glitchpop', 30000000000000)">
+                    Buy
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="font_size">Ion Vandal</h3>
+            <img src="./src/img/ion.png" class="mask" />
+            <div class="box-price">
+                <label class="font">0.000045 ETH</label>
+                <button id="btn_buy" class="button" onclick="btnBuy('Ion', 45000000000000)">
+                    Buy
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="font_size">Prime Vandal</h3>
+            <img src="./src/img/prime.png" class="mask" />
+            <div class="box-price">
+                <label class="font">0.000050 ETH</label>
+                <button id="btn_buy" class="button" onclick="btnBuy('Prime', 50000000000000)">
+                    Buy
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="font_size">Reaver Vandal</h3>
+            <img src="./src/img/reaver.png" class="mask" />
+            <div class="box-price">
+                <label class="font">0.000060 ETH</label>
+                <button id="btn_buy" class="button" onclick="btnBuy('Reaver', 60000000000000)">
+                    Buy
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="font_size">Sentinels Vandal</h3>
+            <img src="./src/img/sentinels.png" class="mask" />
+            <div class="box-price">
+                <label class="font">0.000034 ETH</label>
+                <button id="btn_buy" class="button" onclick="btnBuy('Sentinels', 34000000000000)">
+                    Buy
+                </button>
+            </div>
+        </div>
+
+        <table>
+            <tr>
+                <th>Time</th>
+                <th>Vandal</th>
+                <th>Owner</th>
+            </tr>
+            <tr>
+                <td id="time1"></td>
+                <td id="character1"></td>
+                <td id="owner1"></td>
+            </tr>
+            <tr>
+                <td id="time2"></td>
+                <td id="character2"></td>
+                <td id="owner2"></td>
+            </tr>
+            <tr>
+                <td id="time3"></td>
+                <td id="character3"></td>
+                <td id="owner3"></td>
+            </tr>
+            <tr>
+                <td id="time4"></td>
+                <td id="character4"></td>
+                <td id="owner4"></td>
+            </tr>
+            <tr>
+                <td id="time5"></td>
+                <td id="character5"></td>
+                <td id="owner5"></td>
+            </tr>
+            <tr>
+                <td id="time6"></td>
+                <td id="character6"></td>
+                <td id="owner6"></td>
+            </tr>
+        </table>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+    <script>
+        async function loadWeb3() {
+            if (window.ethereum) {
+                window.web3 = new Web3(window.ethereum);
+                window.ethereum.enable();
+            }
+        }
+
+        let currentAccount = null;
+        window.ethereum
+            .request({ method: "eth_accounts" })
+            .then(handleAccountsChanged)
+            .catch((err) => {
+                console.error(err);
+            });
+
+        window.ethereum.on("accountsChanged", handleAccountsChanged);
+
+        function handleAccountsChanged(accounts) {
+            if (accounts.length === 0) {
+                // MetaMask is locked or the user has not connected any accounts
+                console.log("Please connect to MetaMask.");
+            } else if (accounts[0] !== currentAccount) {
+                currentAccount = accounts[0];
+            }
+        }
+
+        let abi = [
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": false,
+                        "internalType": "address",
+                        "name": "owner",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "string",
+                        "name": "character",
+                        "type": "string"
+                    }
+                ],
+                "name": "Add",
+                "type": "event"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
+                    }
+                ],
+                "name": "buy",
+                "outputs": [],
+                "stateMutability": "payable",
+                "type": "function"
+            }
+        ]
+
+        async function loadContract() {
+            return await new window.web3.eth.Contract(
+                abi,
+                "0xD32Ab705312EDdcd56936b2140c2f06BAE289fB7"
+            );
+        }
+
+        async function load() {
+            await loadWeb3();
+            window.contract = await loadContract();
+            updateStatus("Ready!");
+        }
+
+        function updateStatus(status) {
+            const statusEl = document.getElementById("status");
+            statusEl.innerHTML = status;
+            console.log(status);
+        }
+
+        var i = 0;
+
+        function btnBuy(name, eth) {
+            console.log(currentAccount);
+            window.contract.methods
+                .buy(name)
+                .send({ from: currentAccount, value: eth }, function (error, result) {
+                    $("#result").html(result);
+                });
+            window.contract.once("Add", {}, function (error, event) {
+                if (!error) {
+                    console.log(event);
+                    var h = new Date().getHours();
+                    var m = new Date().getMinutes();
+                    $("#result").html(
+                        "Name:" +
+                        event.returnValues.character +
+                        "<br/>time:" +
+                        h +
+                        ":" +
+                        m +
+                        "<br/>owner:" +
+                        event.returnValues.owner
+                    );
+                    i++;
+                    $("#time" + i).html(h + ":" + m);
+                    $("#character" + i).html(event.returnValues.character);
+                    $("#owner" + i).html(event.returnValues.owner);
+                }
+            });
+        }
+        load();
+    </script>
+</body>
+
+</html>
